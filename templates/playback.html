@@ -52,9 +52,8 @@
                 <h5>抽帧图像</h5>
                 <script src="/static/js/jquery.js"></script>
                 <script src="/static/js/upload.js"></script>
-
                 <div id="drop_area" style="margin: 50px auto;"></div>
-
+                <button style="font-size: large">{{ stus.emotion }}</button>
                 <script type="text/javascript">
                     var dragImgUpload = new DragImgUpload("#drop_area",{
                         callback:function (files) {
@@ -72,9 +71,11 @@
                                 processData : false, // 使数据不做处理
                                 contentType : false, // 不要设置Content-Type请求头
                                 success: function(data){
+                                    alert(1)
                                     console.log(data);
+                                    alert(data);
                                     if (data.status == 'ok') {
-                                        alert('上传成功！');
+                                        alert(data);
                                     }
 
                                 },

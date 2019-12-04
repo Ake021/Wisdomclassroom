@@ -6,6 +6,9 @@ import os
 from aip import AipFace
 import json
 import base64
+import cv2
+import shutil
+
 
 # Create your views here.
 
@@ -18,7 +21,7 @@ def login(request):
         pwd = request.POST.get('pwd')
         user_obj = models.User.objects.filter(name=name, pwd=pwd).first()
         if user_obj:
-            return HttpResponse('index.html')
+            return render(request, "index.html", )
         else:
             return HttpResponse('用户名或密码错误')
 
@@ -77,10 +80,56 @@ def upload(request):
         temp['glasses'] = result['result']['face_list'][0]['glasses']
         temp['beauty'] = result['result']['face_list'][0]['beauty']
         temp['face_shape'] = result['result']['face_list'][0]['face_shape']
-        stus = json.dumps(temp)
+        stus = {'emotion': temp['emotion']}
         print(stus)
-        return render(request, 'home.html', {'stus':stus})
-        #myjson = json.dumps(result['result']['face_list'][0])
-        #print(myjson)
+        return render(request, 'playback.html', {'stus': stus})
+        # myjson = json.dumps(result['result']['face_list'][0])
+        # print(myjson)
 
     return HttpResponse('图片未上传')
+
+
+@csrf_exempt
+def video(request):
+    if request.method == 'GET':
+
+        path = settings.MEDIA_ROOT
+        file = 'pictures'
+        pic_path = path + '/' + file
+        # 视频文件名字
+        filename = 'test.mov'
+
+        # 保存图片的路径
+        savedpath = pic_path + '/' + filename.split('.')[0] + '/'
+        isExists = os.path.exists(savedpath)
+        if not isExists:
+            os.makedirs(savedpath)
+            print('path of %s is build' % (savedpath))
+        else:
+            shutil.rmtree(savedpath)
+            os.makedirs(savedpath)
+            print('path of %s already exist and rebuild' % (savedpath))
+
+        # 视频帧率12
+        fps = 12
+        # 保存图片的帧率间隔
+        count = 10
+
+        # 开始读视频
+        videoCapture = cv2.VideoCapture('media/' + filename)
+        i = 0
+        j = 0
+
+        while True:
+            success, frame = videoCapture.read()
+            i += 1
+            if i % count == 0:
+                # 保存图片
+                j += 1
+                savedname = filename.split('.')[0] + '_' + str(j) + '_' + str(i) + '.jpg'
+                cv2.imwrite(savedpath + savedname, frame)
+                print('image of %s is saved' % (savedname))
+            if not success:
+                print('video is all read')
+                break
+    return HttpResponse('成功')

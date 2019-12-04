@@ -20,5 +20,6 @@ from WC_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', views.login),
-    path('upload/', views.upload)
+    path('upload/', views.upload),
+    path('video/', views.video)
 ]

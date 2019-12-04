@@ -23,8 +23,7 @@
                 <li><p><img src="/static/img/video.png"> </p><a href="/static/user.html" target="iframename">监控视频</a> </li>
                 <li><p><img src="/static/img/anyais.png"> </p><a href="/static/AssistantRun.html" target="iframename">统计分析</a> </li>
                 <li><p><img src="/static/img/anyais.png"> </p><a href="/static/set.html" target="iframename">摄像头管理</a> </li>
-                <li><p><img src="/static/img/sysset.png"> </p><a href="/static/playback.html" target="iframename">识别设置</a> </li>
-
+                <li><p><img src="/static/img/sysset.png"> </p><a href="/static/playback.html" target="iframename" onclick="refresh(this)">识别设置</a> </li>
             </ul>
         </nav>
     </aside>
@@ -38,6 +37,19 @@
 </main>
 <script src="/static/js/jquery.min.js"></script>
 <script>
+    function refresh(e){
+
+        var tempUrl = e.href;
+
+        if(tempUrl.indexOf('?') != -1){
+
+            tempUrl = tempUrl.subString(0, tempUrl.indexOf('?'));
+
+        }
+
+        e.href = e.href + "?random=" + Math.floor(Math.random()*100000);
+
+    }
     $(function(){
         $('.nav-ul li').click(function(){
             var dis=$(this).find(".nav_son_ul").css("visibility");
