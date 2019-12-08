@@ -8,6 +8,7 @@ import json
 import base64
 import cv2
 import shutil
+from aip import AipImageClassify
 
 
 # Create your views here.
@@ -46,10 +47,7 @@ def upload(request):
             for data in img.chunks():
                 f.write(data)
 
-        APP_ID = '17815113'
-        API_KEY = '05mBey1pCfocw0F4QlpG6qEK'
-        SECRET_KEY = 'wYnGQaNV7exLZvitmUtlzM4lzKs9odjd'
-        client = AipFace(APP_ID, API_KEY, SECRET_KEY)
+        client = AipFace('17815113', '05mBey1pCfocw0F4QlpG6qEK', 'wYnGQaNV7exLZvitmUtlzM4lzKs9odjd')
 
         with open(img_url, 'rb') as f:
             base64_data = base64.b64encode(f.read())
@@ -65,7 +63,7 @@ def upload(request):
 
         """ 如果有可选参数 """
         options = {}
-        options["face_field"] = "age,emotion,expression,gender,race,glasses,beauty,face_shape"
+        options["face_field"] = "emotion,face_shape,expression"
         options["max_face_num"] = 2
         options["face_type"] = "LIVE"
         options["liveness_control"] = "LOW"
@@ -73,15 +71,33 @@ def upload(request):
         """ 带参数调用人脸检测 """
         result = client.detect(image, imageType, options)
         temp = {}
-        temp['emotion'] = result['result']['face_list'][0]['emotion']
-        temp['age'] = result['result']['face_list'][0]['age']
-        temp['gender'] = result['result']['face_list'][0]['gender']
-        temp['race'] = result['result']['face_list'][0]['race']
-        temp['glasses'] = result['result']['face_list'][0]['glasses']
-        temp['beauty'] = result['result']['face_list'][0]['beauty']
-        temp['face_shape'] = result['result']['face_list'][0]['face_shape']
+        fea = ['emotion', 'face_shape', 'expression']
+        print(result)
+        """for a in fea:
+            temp[a] = result['result']['face_list'][0][a]
         stus = {'emotion': temp['emotion']}
-        print(stus)
+        print(temp)"""
+        stus = temp
+
+        def sss(img_url):
+            APP_ID = '17926029'
+            API_KEY = 'dvzmdFFaMFidNass4pZcYals'
+            SECRET_KEY = 'GTRmEpFHT1zXVNEhWX3rzzfLgXFkLREf'
+            client = AipImageClassify(APP_ID, API_KEY, SECRET_KEY)
+            print(img_url)
+            def get_file_content(img):
+                with open(img, 'rb') as fp:
+                    return fp.read()
+            image = get_file_content(img_url)
+            #	调用通用物体识别
+            client.advancedGeneral(image)
+            #	如果有可选参数
+            options = {}
+            options["baike_num"] = 5
+            #	带参数调用通用物体识别
+            result = client.advancedGeneral(image, options)
+            return result
+        print(sss(img_url))
         return render(request, 'playback.html', {'stus': stus})
         # myjson = json.dumps(result['result']['face_list'][0])
         # print(myjson)
@@ -107,8 +123,6 @@ def video(request):
             print('path of %s is build' % (savedpath))
         else:
             shutil.rmtree(savedpath)
-            os.makedirs(savedpath)
-            print('path of %s already exist and rebuild' % (savedpath))
 
         # 视频帧率12
         fps = 12
